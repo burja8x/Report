@@ -13,7 +13,7 @@ spec:
         app: report-v1
     spec:
       containers:
-        - image: burja8x/report:1.1
+        - image: burja8x/report:2.1
           name: report-v1
           env:
             - name: APP_CONFIG_CONN_STRING

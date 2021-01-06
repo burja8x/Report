@@ -22,9 +22,9 @@ namespace Report
                 {
                     webBuilder.ConfigureAppConfiguration((hostingContext, config) =>
                     {
-                        var settings = config.Build();
-                        var connection = settings.GetConnectionString("AppConfig");
-                        //var connection = Environment.GetEnvironmentVariable("APP_CONFIG_CONN_STRING");
+                        //var settings = config.Build();
+                        //var connection = settings.GetConnectionString("AppConfig");
+                        var connection = Environment.GetEnvironmentVariable("APP_CONFIG_CONN_STRING");
                         config.AddAzureAppConfiguration(options =>
                         {
                             options.Connect(connection)
