@@ -44,5 +44,14 @@ namespace Report.Controllers
             Console.WriteLine("insert done.");
             return "OK";
         }
+
+        [HttpPost]
+        [Consumes("application/x-www-form-urlencoded")]
+        public IActionResult Post([FromForm] string data)
+        {
+            Console.WriteLine(data);
+            return Json(data);
+        }
+        //http://20.52.212.120/report/api/v1/report
     }
 }
