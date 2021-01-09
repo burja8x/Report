@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -17,7 +18,7 @@ namespace Report
         public static bool SendSMS(string number, string content) {
             string url1 = $"{url}un={username}&ps={pass}&from={from}&to={number}&m={content}&cc={cc}";
             string response = GetRequest(url1);
-            Console.WriteLine(response);
+            Log.Information(response);
             if (response.Contains("ERROR")) {
                 return false;
             }
@@ -30,12 +31,13 @@ namespace Report
                 WebClient web = new WebClient();
 
                 string result = web.DownloadString(url);
-                Console.Write($"Respone sms api:{result}.");
+                //Log.Information($"Respone SMS api:{result}.");
                 return result;
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Log.Error(ex.Message + ex.StackTrace + "\n URL: " + url);
+                
                 return "SMS Api ERROR";
             }
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -29,7 +30,7 @@ namespace Report
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.StackTrace);
+                Log.Error(e, "GetReportTable");
             }
             finally
             {
@@ -59,12 +60,12 @@ namespace Report
                 }
                 else
                 {
-                    Console.WriteLine($"ERROR InsertReport {cmd.CommandText}");
+                    Log.Warning($"InsertReport -> numAffectedRows={numAffectedRows}. SQL:{cmd.CommandText}");
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Log.Error(e, "InsertReport");
             }
             finally
             {
@@ -89,14 +90,13 @@ namespace Report
                 }
                 else
                 {
-                    Console.WriteLine($"UpdateReport -> numAffectedRows = {numAffectedRows}");
+                    Log.Warning($"UpdateReport -> numAffectedRows = {numAffectedRows}  SQL:{cmd.CommandText}");
                 }
                 
             }
             catch (Exception e)
             {
-                Console.WriteLine("ERROR UpdateReportInfo:");
-                Console.WriteLine(e.StackTrace);
+                Log.Error(e, "UpdateReportInfo");
             }
             finally
             {
@@ -116,7 +116,6 @@ namespace Report
                 while (reader.Read())
                 {
                     string datetime = reader[0].ToString();
-                    //Console.WriteLine(datetime);
                     var n = DateTime.Parse(datetime);
                     conn.Close();
 
@@ -125,7 +124,7 @@ namespace Report
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.StackTrace);
+                Log.Error(e, "GetSysDateTime");
             }
             finally
             {

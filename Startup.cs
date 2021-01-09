@@ -5,8 +5,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -56,6 +59,19 @@ namespace Report
             SmsAPI.url = Configuration.GetSection("Report:Settings:SMSApiURL").Value;
             SmsAPI.username = Configuration.GetSection("Report:Settings:SMSApiUsername").Value;
             Data.sqlConnStr = Configuration.GetSection("Report:Settings:SQLConn").Value;
+            
+            string text = File.ReadAllText("logConfig.json");
+            text = text.Replace("CHANGE_ME_TCPSink_URI", Configuration.GetSection("Report:Settings:SerilogURI").Value);
+            File.WriteAllText("logConfig1.json", text);
+            var configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("logConfig1.json")
+                    .Build();
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .CreateLogger();
+            
+            //app.UseSerilogRequestLogging();
 
             Core core = new Core();
         }

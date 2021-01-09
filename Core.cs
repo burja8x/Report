@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +43,7 @@ namespace Report
                 CheckToSend(reportRows, (DateTime)time);
             }
             else {
-                Console.WriteLine("ERROR DateTime from DB == null!");
+                Log.Error("ERROR DateTime from DB == null!");
             }
 
         }
@@ -54,7 +55,7 @@ namespace Report
                     row.info.Contains(Core.POD_UUID) && 
                     IsBetween<long>(Math.Abs(row.last_update.Ticks - time.Ticks), 0, 300000000)) { // 30 sec
 
-                    Console.WriteLine($"Sending... ID:{row.id}");
+                    Log.Information($"Sending... ID:{row.id}");
                     // SEND AND UPDATE TABLE.
                     bool response = SmsAPI.SendSMS(row.mobi, row.content);
 
@@ -68,11 +69,11 @@ namespace Report
                 }
 
                 if (row.info.Length == 0 || row.info.StartsWith("processing")) {
-                    Console.WriteLine($"time {row.last_update.Ticks.ToString()}   {time.Ticks.ToString()}  -{row.last_update.Ticks - time.Ticks}");
+                    //Log.Information($"time {row.last_update.Ticks.ToString()}   {time.Ticks.ToString()}  -{row.last_update.Ticks - time.Ticks}");
 
-                    if (!IsBetween<long>(Math.Abs(row.last_update.Ticks - time.Ticks), 0, 300000000)) {
+                    if (!IsBetween<long>(Math.Abs(row.last_update.Ticks - time.Ticks), 0, 300000000)) { //30s
                         // we will send, but first do reservation.
-                        Console.WriteLine($"Row reservation {row.id}.");
+                        Log.Information($"Row reservation {row.id}.");
                         Data.UpdateReportInfo(row.id, $"processing by: {Core.POD_UUID}");
                         _timerSelectDB.Interval = 5000;
                     }

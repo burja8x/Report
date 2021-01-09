@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,11 +23,26 @@ namespace Report.Controllers
         [HttpPost]
         public ActionResult<string> Post(IFormCollection collection)
         {
-            Console.WriteLine("POST !!!!");
-            Console.WriteLine();
+            var lines = collection.Select(kvp => kvp.Key + ": " + kvp.Value.ToString());
+            Log.Information("POST: " + string.Join(Environment.NewLine, lines));
+            return HandlePost(collection);
+        }
+
+        [HttpPost]
+        [Consumes("application/x-www-form-urlencoded")]
+        public IActionResult Post([FromForm] string data)
+        {
+            var collection = Request.Form;
+            var lines = collection.Select(kvp => kvp.Key + ": " + kvp.Value.ToString());
+            Log.Information("POST2: " + string.Join(Environment.NewLine, lines));
+            return Json(HandlePost(collection));
+        }
+        public string HandlePost(IFormCollection collection) {
+
             if (collection.Count < 2 || collection["content"].ToString().Length == 0)
-            {   
-                Console.WriteLine($"ERROR no data.{collection}");
+            {
+                //Log.Information("POST: " + string.Join(Environment.NewLine, lines));
+                Log.Warning($"ERROR no data.{collection}");
                 return $"ERROR no data.{collection}";
             }
             if (collection["sms"].ToString().Length == 9 || collection["mail"].ToString().Length > 9)
@@ -37,21 +53,13 @@ namespace Report.Controllers
                     return "NOT OK";
                 }
             }
-            else {
-                Console.WriteLine("phone number must be length == 9. mail....");
+            else
+            {
+                Log.Warning("phone number must be length == 9. mail....");
                 return "NOT OK x";
             }
-            Console.WriteLine("insert done.");
+            Log.Information("Insert done.");
             return "OK";
         }
-
-        [HttpPost]
-        [Consumes("application/x-www-form-urlencoded")]
-        public IActionResult Post([FromForm] string data)
-        {
-            Console.WriteLine(data);
-            return Json(data);
-        }
-        //http://20.52.212.120/report/api/v1/report
     }
 }
